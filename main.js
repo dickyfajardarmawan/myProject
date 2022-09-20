@@ -131,12 +131,13 @@ function sendChat() {
     }
     if (getValue('message') !== '') {
         multiPost('public-chat', body);
+        scrollDown();
     }
     setValue('message', '');
 }
 
 function read() {
-    var ref = firebase.database().ref('public-chat').limitToLast(3);;
+    var ref = firebase.database().ref('public-chat').limitToLast(20);
     
     ref.on("child_added", function(snapshot) {
         console.log(snapshot.val());
@@ -163,7 +164,7 @@ function read() {
             </div>
             `;
         }
-        
+        scrollDown();
     }, function (error) {
         console.log("Error: " + error.code);
     });
@@ -175,4 +176,9 @@ function enterChat() {
           sendChat();
         }
     });
+}
+
+function scrollDown() {
+    var objDiv = document.getElementById("chatList");
+    objDiv.scrollTop = objDiv.scrollHeight;
 }
