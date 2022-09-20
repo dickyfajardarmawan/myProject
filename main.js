@@ -43,6 +43,7 @@ function checkStatus() {
             `)
             document.getElementById("photoChat").src = user.photoURL;
             read();
+            enterChat();
         }, 500);
     }
 }
@@ -166,14 +167,10 @@ function read() {
     });
 }
 
-try {
-    setTimeout(() => {
-        document.getElementById('message').addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-              sendChat();
-            }
-        });
-    }, 500);
-} catch (error) {
-    
+function enterChat() {
+    document.getElementById('message').addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+          sendChat();
+        }
+    });
 }
