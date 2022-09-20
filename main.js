@@ -59,7 +59,8 @@ function googleSignin() {
         localStorage.setItem('Token', token);
         console.log(user)
         localStorage.setItem('User', JSON.stringify(user));
-        checkStatus();
+        // checkStatus();
+        location.reload();
     }).catch(function(error) {
        var errorCode = error.code;
        var errorMessage = error.message;
@@ -75,7 +76,8 @@ function googleSignout() {
     .then(function() {
         console.log('Signout Succesfull')
         setTimeout(() => {
-            checkStatus();
+            // checkStatus();
+            location.reload();
         }, 500);
         localStorage.clear();
     }, function(error) {
