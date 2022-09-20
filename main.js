@@ -42,6 +42,7 @@ function checkStatus() {
               /> <span style="margin-left: 10px;font-size: 15px;">`+ user.displayName +`</span>
             `)
             document.getElementById("photoChat").src = user.photoURL;
+            read();
         }, 500);
     }
 }
@@ -132,8 +133,8 @@ function sendChat() {
 }
 
 function read() {
-    var ref = firebase.database().ref('public-chat');
-
+    var ref = firebase.database().ref('public-chat').limitToLast(3);;
+    
     ref.on("child_added", function(snapshot) {
         console.log(snapshot.val());
         if (snapshot.val().sender == user.displayName) {
@@ -164,8 +165,6 @@ function read() {
         console.log("Error: " + error.code);
     });
 }
-
-read();
 
 try {
     setTimeout(() => {
