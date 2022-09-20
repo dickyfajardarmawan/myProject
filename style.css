@@ -78,8 +78,21 @@ body {
 
 #chat1 {
     width: 330px;
-    position: absolute;
+    position: fixed;
     bottom: 15px;
     right: 15px;
     height: 500px;
+}
+
+.dot {
+  height: 60px;
+  width: 60px;
+  background-color: rgb(255 255 255);
+  border-radius: 50%;
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  border: 1px solid #63b0e0;
+  color: #6aa7d4;
+  font-size: 22px;
 }
