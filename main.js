@@ -155,7 +155,7 @@ function read() {
         } else {
             document.getElementById('chatList').innerHTML += `
             <div class="d-flex flex-row justify-content-end mb-4">
-                <div class="p-3 me-3 border" style="border-radius: 15px; background-color: #fbfbfb;">
+                <div class="p-3 me-3 border" style="border-radius: 15px; background-color: #d6d6d6;">
                 <p class="small mb-0 fw-bold">`+ snapshot.val().sender +`</p>
                 <p class="small mb-0">`+ snapshot.val().message +`</p>
                 </div>
