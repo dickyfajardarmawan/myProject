@@ -11,6 +11,14 @@ const firebaseConfig = {
     measurementId: "G-SYKVEDYX3K"
 };
 
+var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+var today  = new Date();
+var todayDate = today.toLocaleDateString("en-US", options);
+const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+var currentTime = " " + today.getHours() + ":" + today.getMinutes() + " " + timezone
+
+console.log(currentTime);
+
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 var ref = database.ref();
@@ -27,8 +35,8 @@ function checkStatus() {
         displayPage('login', '');
     } else {
         displayPage('home', '');
-        displayPage('chat-icon', 'none');
-        displayPage('public-chat', '');
+        displayPage('chat-icon', '');
+        displayPage('public-chat', 'none');
         displayPage('login', 'none');
         user = JSON.parse(localStorage.getItem('User'));
         setTimeout(() => {
@@ -42,8 +50,11 @@ function checkStatus() {
               /> <span style="margin-left: 10px;font-size: 15px;">`+ user.displayName +`</span>
             `)
             document.getElementById("photoChat").src = user.photoURL;
-            read();
+            readChat();
+            readStatusUser();
             enterChat();
+            totalUserOnline();
+            changeStatusUser();
         }, 500);
     }
 }
@@ -61,6 +72,12 @@ function googleSignin() {
         localStorage.setItem('User', JSON.stringify(user));
         // checkStatus();
         location.reload();
+        let userStatusBody = {
+            username: user.displayName,
+            status: "online",
+            date: todayDate + currentTime
+        }
+        singlePost('user-status', user.uid, userStatusBody);
     }).catch(function(error) {
        var errorCode = error.code;
        var errorMessage = error.message;
@@ -71,6 +88,13 @@ function googleSignin() {
 }
 
 function googleSignout() {
+    const currentDate = new Date();
+    let userStatusBody = {
+        username: user.displayName,
+        status: "offline",
+        date: todayDate + currentTime
+    }
+    singlePost('user-status', user.uid, userStatusBody);
     firebase.auth().signOut()
     
     .then(function() {
@@ -105,6 +129,7 @@ function btnChat(chatStatus) {
     if (chatStatus) {
         displayPage('public-chat', '');
         displayPage('chat-icon', 'none');
+        scrollDown();
     } else {
         displayPage('public-chat', 'none');
         displayPage('chat-icon', '');
@@ -136,11 +161,11 @@ function sendChat() {
     setValue('message', '');
 }
 
-function read() {
+function readChat() {
     var ref = firebase.database().ref('public-chat').limitToLast(20);
     
     ref.on("child_added", function(snapshot) {
-        console.log(snapshot.val());
+        // console.log(snapshot.val());
         if (snapshot.val().sender == user.displayName) {
             document.getElementById('chatList').innerHTML += `
             <div class="d-flex flex-row justify-content-start mb-4">
@@ -170,6 +195,40 @@ function read() {
     });
 }
 
+function readStatusUser() {
+    var ref = firebase.database().ref('user-status').limitToLast(20);
+    var i = 0;
+    
+    ref.on("child_added", function(snapshot) {
+        console.log(i);
+        i++;
+        var res = snapshot.val();
+        console.log(snapshot.key);
+        console.log(res);
+        if (res.status == 'online') {
+            document.getElementById('userStatus').innerHTML += `
+            <tr id="`+ snapshot.key +`">
+                <td>`+ i +`</td>
+                <td>`+ res.username +`</td>
+                <td class="status-green">`+ res.status +`</td>
+                <td>`+ res.date +`</td>
+            </tr>
+            `;
+        } else {
+            document.getElementById('userStatus').innerHTML += `
+            <tr id="`+ snapshot.key +`">
+                <td>`+ i +`</td>
+                <td>`+ res.username +`</td>
+                <td class="status-red">`+ res.status +`</td>
+                <td>`+ res.date +`</td>
+            </tr>
+            `;
+        }
+    }, function (error) {
+        console.log("Error: " + error.code);
+    });
+}
+
 function enterChat() {
     document.getElementById('message').addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
@@ -181,4 +240,37 @@ function enterChat() {
 function scrollDown() {
     var objDiv = document.getElementById("chatList");
     objDiv.scrollTop = objDiv.scrollHeight;
+}
+
+function totalUserOnline() {
+    ref.child("user-status").on("value", function(snapshot) {
+        displayText('totalUser', snapshot.numChildren());
+    })
+}
+
+function changeStatusUser() {
+    var ref = firebase.database().ref('user-status');
+    var i = 0
+    ref.on("child_changed", function(snapshot) {
+        i++;
+        var res = snapshot.val();
+        console.log(res);
+        if (res.status == 'online') {
+            document.getElementById(snapshot.key).innerHTML = `
+                <td>`+ i +`</td>
+                <td>`+ res.username +`</td>
+                <td class="status-green">`+ res.status +`</td>
+                <td>`+ res.date +`</td>
+            `;
+        } else {
+            document.getElementById(snapshot.key).innerHTML = `
+                <td>`+ i +`</td>
+                <td>`+ res.username +`</td>
+                <td class="status-red">`+ res.status +`</td>
+                <td>`+ res.date +`</td>
+            `;
+        }
+    }, function (error) {
+        console.log("Error: " + error.code);
+    });
 }

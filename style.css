@@ -96,3 +96,13 @@ body {
   color: #6aa7d4;
   font-size: 22px;
 }
+
+.status-red {
+  font-weight: bold;
+  color: red;
+}
+
+.status-green {
+  font-weight: bold;
+  color: green;
+}
