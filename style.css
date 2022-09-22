@@ -106,3 +106,13 @@ body {
   font-weight: bold;
   color: green;
 }
+
+.btnEdit {
+  width: 91px;
+  margin-bottom: 10px;
+}
+
+.btnDelete {
+  width: 91px;
+  margin-bottom: 10px;
+}

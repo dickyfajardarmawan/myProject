@@ -1,0 +1,65 @@
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5>DATA CRUD</h5>
+            <button type="button" class="btn btn-success" data-mdb-toggle="modal" data-mdb-target="#addDataModal">Add</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Nama</th>
+                  <th scope="col">Deskripsi</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody id="listData">
+                
+              </tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span>Total Data: </span>
+            <div>
+                <button class="btn btn-info">Prev</button>
+                <button class="btn btn-info">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addDataModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Data</h5>
+          <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <!-- Email input -->
+            <div class="form-outline mb-4">
+                <input type="text" id="dataName" class="form-control" />
+                <label class="form-label">Nama</label>
+            </div>
+
+            <!-- Password input -->
+            <div class="form-outline mb-4">
+                <input type="text" id="dataDesc" class="form-control" />
+                <label class="form-label" for="form1Example2">Deskripsi</label>
+            </div>
+
+            <select name="" id="dataStatus" class="form-control" style="border: 0px; border-bottom: 1px solid #ccc;">
+                <option value="Rejected">Rejected</option>
+                <option value="Accepted">Accepted</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+          <button id="btnAddData" type="button" class="btn btn-primary" onclick="addData()">Add Data</button>
+        </div>
+      </div>
+    </div>
+</div>

@@ -55,6 +55,17 @@ function checkStatus() {
             enterChat();
             totalUserOnline();
             changeStatusUser();
+            displayPage('data-crud', 'none');
+            var pageON = localStorage.getItem('onPage');
+            console.log(pageON);
+            if (pageON == 'dashboard') {
+                containDashboard();
+            } else if (pageON == 'data') {
+                containData();
+                readDataCrud();
+            } else {
+                containDashboard();
+            }
         }, 500);
     }
 }
@@ -229,6 +240,33 @@ function readStatusUser() {
     });
 }
 
+function readDataCrud() {
+    var ref = firebase.database().ref('data-crud').orderByKey().limitToLast(5);
+    var i = 0;
+    
+    ref.on("child_added", function(snapshot) {
+        console.log(i);
+        i++;
+        var res = snapshot.val();
+        console.log(snapshot.key);
+        console.log(res);
+        document.getElementById('listData').innerHTML += `
+            <tr id="`+ snapshot.key +`">
+                <td>`+ i +`</td>
+                <td>`+ res.namaData +`</td>
+                <td>`+ res.descData +`</td>
+                <td>`+ res.statData +`</td>
+                <td>
+                    <button type="button" class="btn btn-primary btnEdit">Edit</button>
+                    <button type="button" class="btn btn-danger btnDelete">Delete</button>
+                </td>
+            </tr>
+        `;
+    }, function (error) {
+        console.log("Error: " + error.code);
+    });
+}
+
 function enterChat() {
     document.getElementById('message').addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
@@ -273,4 +311,44 @@ function changeStatusUser() {
     }, function (error) {
         console.log("Error: " + error.code);
     });
+}
+
+function mainDashboardPage() {
+    containDashboard();
+    localStorage.setItem('onPage', 'dashboard');
+}
+
+function dataCrudPage() {
+    containData();
+    localStorage.setItem('onPage', 'data');
+}
+
+function containDashboard() {
+    displayPage('dashboard', '');
+    displayPage('data-crud', 'none');
+    document.getElementById('dataCrudLink').classList.remove('active');
+    document.getElementById('mainDashboardLink').classList.add('active');
+}
+
+function containData() {
+    displayPage('dashboard', 'none');
+    displayPage('data-crud', '');
+    document.getElementById('mainDashboardLink').classList.remove('active');
+    document.getElementById('dataCrudLink').classList.add('active');
+}
+
+function addData() {
+    console.log('zzzz');
+    var jsonBody = {
+        namaData: getValue('dataName'),
+        descData: getValue('dataDesc'),
+        statData: getValue('dataStatus')
+    }
+    console.log(jsonBody);
+    if (jsonBody.namaData == "" || jsonBody.descData == "") {
+
+    } else {
+        multiPost('data-crud', jsonBody)
+        location.reload();
+    }
 }
