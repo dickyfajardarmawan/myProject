@@ -17,7 +17,6 @@ var todayDate = today.toLocaleDateString("en-US", options);
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 var currentTime = " " + today.getHours() + ":" + today.getMinutes() + " " + timezone
 
-console.log(currentTime);
 
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
@@ -50,6 +49,12 @@ function checkStatus() {
               /> <span style="margin-left: 10px;font-size: 15px;">`+ user.displayName +`</span>
             `)
             document.getElementById("photoChat").src = user.photoURL;
+            let userStatusBody = {
+                username: user.displayName,
+                status: "online",
+                date: todayDate + currentTime
+            }
+            singlePost('user-status', user.uid, userStatusBody);
             readChat();
             readStatusUser();
             enterChat();
@@ -57,7 +62,6 @@ function checkStatus() {
             changeStatusUser();
             displayPage('data-crud', 'none');
             var pageON = localStorage.getItem('onPage');
-            console.log(pageON);
             if (pageON == 'dashboard') {
                 containDashboard();
             } else if (pageON == 'data') {
@@ -77,9 +81,9 @@ function googleSignin() {
         var token = result.credential.accessToken;
         var user = result.user;
         
-        console.log(token)
+        // console.log(token)
         localStorage.setItem('Token', token);
-        console.log(user)
+        // console.log(user)
         localStorage.setItem('User', JSON.stringify(user));
         // checkStatus();
         location.reload();
@@ -156,10 +160,6 @@ function setValue(id, valueId) {
 }
 
 function sendChat() {
-    console.log(user.uid);
-    console.log(user.displayName);
-    console.log(getValue('message'));
-
     let body = {
         sender: user.displayName,
         photoSender: user.photoURL,
@@ -207,19 +207,13 @@ function readChat() {
 }
 
 function readStatusUser() {
-    var ref = firebase.database().ref('user-status').limitToLast(20);
-    var i = 0;
+    var ref = firebase.database().ref('user-status').limitToLast(5);
     
     ref.on("child_added", function(snapshot) {
-        console.log(i);
-        i++;
         var res = snapshot.val();
-        console.log(snapshot.key);
-        console.log(res);
         if (res.status == 'online') {
             document.getElementById('userStatus').innerHTML += `
             <tr id="`+ snapshot.key +`">
-                <td>`+ i +`</td>
                 <td>`+ res.username +`</td>
                 <td class="status-green">`+ res.status +`</td>
                 <td>`+ res.date +`</td>
@@ -228,7 +222,6 @@ function readStatusUser() {
         } else {
             document.getElementById('userStatus').innerHTML += `
             <tr id="`+ snapshot.key +`">
-                <td>`+ i +`</td>
                 <td>`+ res.username +`</td>
                 <td class="status-red">`+ res.status +`</td>
                 <td>`+ res.date +`</td>
@@ -245,11 +238,8 @@ function readDataCrud() {
     var i = 0;
     
     ref.on("child_added", function(snapshot) {
-        console.log(i);
         i++;
         var res = snapshot.val();
-        console.log(snapshot.key);
-        console.log(res);
         document.getElementById('listData').innerHTML += `
             <tr id="`+ snapshot.key +`">
                 <td>`+ i +`</td>
@@ -257,14 +247,51 @@ function readDataCrud() {
                 <td>`+ res.descData +`</td>
                 <td>`+ res.statData +`</td>
                 <td>
-                    <button type="button" class="btn btn-primary btnEdit">Edit</button>
-                    <button type="button" class="btn btn-danger btnDelete">Delete</button>
+                    <button type="button" class="btn btn-primary btnEdit" data-mdb-toggle="modal" data-mdb-target="#editDataModal" onclick="viewEditData('`+ snapshot.key +`')">Edit</button>
+                    <button type="button" class="btn btn-danger btnDelete" onclick="deleteData('`+ snapshot.key +`')">Delete</button>
                 </td>
             </tr>
         `;
     }, function (error) {
         console.log("Error: " + error.code);
     });
+}
+
+function viewEditData(idData) {
+    var ref = firebase.database().ref('data-crud/' + idData);
+
+    ref.on("value", function(snapshot) {
+        document.getElementById('editDataName').value = snapshot.val().namaData;
+        document.getElementById('editDataDesc').value = snapshot.val().descData;
+        document.getElementById('editDataStatus').value = snapshot.val().statData;
+        document.getElementById('footerEdit').innerHTML = `
+            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="editData('` + idData +`')">Edit Data</button>
+        `;
+    }, function (error) {
+        console.log("Error: " + error.code);
+    });
+    // console.log(idData);
+}
+
+function editData(idData) {
+    var jsonBody = {
+        namaData: getValue('editDataName'),
+        descData: getValue('editDataDesc'),
+        statData: getValue('editDataStatus')
+    }
+    if (jsonBody.namaData == "" || jsonBody.descData == "") {
+
+    } else {
+        singlePost('data-crud', idData, jsonBody)
+        location.reload();
+    }
+}
+
+function deleteData(idData) {
+    const userRef = firebase.database().ref().child('data-crud/' + idData);
+    userRef.remove()
+    location.reload();
 }
 
 function enterChat() {
@@ -292,7 +319,6 @@ function changeStatusUser() {
     ref.on("child_changed", function(snapshot) {
         i++;
         var res = snapshot.val();
-        console.log(res);
         if (res.status == 'online') {
             document.getElementById(snapshot.key).innerHTML = `
                 <td>`+ i +`</td>
@@ -316,11 +342,13 @@ function changeStatusUser() {
 function mainDashboardPage() {
     containDashboard();
     localStorage.setItem('onPage', 'dashboard');
+    location.reload();
 }
 
 function dataCrudPage() {
     containData();
     localStorage.setItem('onPage', 'data');
+    location.reload();
 }
 
 function containDashboard() {
@@ -338,17 +366,24 @@ function containData() {
 }
 
 function addData() {
-    console.log('zzzz');
     var jsonBody = {
         namaData: getValue('dataName'),
         descData: getValue('dataDesc'),
         statData: getValue('dataStatus')
     }
-    console.log(jsonBody);
     if (jsonBody.namaData == "" || jsonBody.descData == "") {
 
     } else {
         multiPost('data-crud', jsonBody)
         location.reload();
     }
+}
+
+function closeApp() {
+    let userStatusBody = {
+        username: user.displayName,
+        status: "offline",
+        date: todayDate + currentTime
+    }
+    singlePost('user-status', user.uid, userStatusBody);
 }
