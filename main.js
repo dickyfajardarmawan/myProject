@@ -67,6 +67,16 @@ function checkStatus() {
             } else if (pageON == 'data') {
                 containData();
                 readDataCrud();
+                setTimeout(() => {
+                    $(document).ready( function () {
+                        $('#dataTableCrud').DataTable();
+                    } );
+                }, 500);
+            } else if (pageON == 'data-table') {
+                containDataTable();
+                $(document).ready( function () {
+                    $('#table_id').DataTable();
+                } );
             } else {
                 containDashboard();
             }
@@ -351,18 +361,37 @@ function dataCrudPage() {
     location.reload();
 }
 
+function dataTablePage() {
+    containDataTable();
+    localStorage.setItem('onPage', 'data-table');
+    location.reload();
+}
+
 function containDashboard() {
     displayPage('dashboard', '');
     displayPage('data-crud', 'none');
+    displayPage('data-table', 'none');
     document.getElementById('dataCrudLink').classList.remove('active');
+    // document.getElementById('dataTableLink').classList.remove('active');
     document.getElementById('mainDashboardLink').classList.add('active');
 }
 
 function containData() {
     displayPage('dashboard', 'none');
     displayPage('data-crud', '');
+    displayPage('data-table', 'none');
     document.getElementById('mainDashboardLink').classList.remove('active');
+    // document.getElementById('dataTableLink').classList.remove('active');
     document.getElementById('dataCrudLink').classList.add('active');
+}
+
+function containDataTable() {
+    displayPage('dashboard', 'none');
+    displayPage('data-crud', 'none');
+    displayPage('data-table', '');
+    document.getElementById('mainDashboardLink').classList.remove('active');
+    document.getElementById('dataCrudLink').classList.remove('active');
+    document.getElementById('dataTableLink').classList.add('active');
 }
 
 function addData() {

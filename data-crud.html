@@ -1,11 +1,11 @@
 <div class="card mb-3">
     <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center mb-3">
             <h5>DATA CRUD</h5>
             <button type="button" class="btn btn-success" data-mdb-toggle="modal" data-mdb-target="#addDataModal">Add</button>
         </div>
         <div style="overflow-x:auto;">
-          <table class="table">
+          <table id="dataTableCrud" class="table">
               <thead>
                 <tr>
                   <th scope="col">#</th>
@@ -20,13 +20,13 @@
               </tbody>
           </table>
         </div>
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <span>Total Data: </span>
+        <!-- <div class="d-flex justify-content-between align-items-center mt-3">
+            <span></span>
             <div>
                 <button class="btn btn-info">Prev</button>
                 <button class="btn btn-info">Next</button>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>
 
